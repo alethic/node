@@ -378,6 +378,9 @@
               '-std:c++20',
               # The following option reduces the "error C1060: compiler is out of heap space"
               '/Zm2000',
+              # Spectre variant 1 mitigation, required for the published libnode
+              # binaries to pass BinSkim.
+              '/Qspectre',
             ],
           }],
           ['control_flow_guard=="true"', {
