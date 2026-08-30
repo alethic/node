@@ -1480,6 +1480,15 @@
 
       'sources': [
         'test/embedding/embedtest.cc',
+        'test/embedding/embedtest_c_api.c',
+        'test/embedding/embedtest_c_api_common.c',
+        'test/embedding/embedtest_c_api_common.h',
+        'test/embedding/embedtest_c_api_env.c',
+        'test/embedding/embedtest_c_api_modules.c',
+        'test/embedding/embedtest_c_api_preload.c',
+        'test/embedding/embedtest_c_api_run_main.c',
+        'test/embedding/embedtest_c_api_threading.c',
+        'test/embedding/embedtest_main.cc',
       ],
 
       'conditions': [

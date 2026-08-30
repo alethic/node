@@ -215,6 +215,19 @@ export default [
     },
   },
   {
+    // Scripts loaded into an embedded runtime by the embedtest binary rather
+    // than run by the test runner, so `common` is not available to them.
+    files: [
+      'test/embedding/preload-with-worker.js',
+      'test/embedding/use-linked-modules.js',
+    ],
+    rules: {
+      'node-core/required-modules': 'off',
+      'node-core/require-common-first': 'off',
+      'node-core/must-call-assert': 'off',
+    },
+  },
+  {
     files: [
       'test/es-module/test-esm-example-loader.js',
       'test/es-module/test-esm-type-flag.js',
