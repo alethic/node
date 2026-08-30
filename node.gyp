@@ -122,6 +122,7 @@
       'src/node_debug.cc',
       'src/node_dir.cc',
       'src/node_dotenv.cc',
+      'src/node_embedding_api.cc',
       'src/node_env_var.cc',
       'src/node_errors.cc',
       'src/node_external_reference.cc',
@@ -243,6 +244,7 @@
       'src/module_wrap.h',
       'src/node.h',
       'src/node_api.h',
+      'src/node_api_internals.h',
       'src/node_api_types.h',
       'src/node_binding.h',
       'src/node_blob.h',
@@ -255,6 +257,7 @@
       'src/node_debug.h',
       'src/node_dir.h',
       'src/node_dotenv.h',
+      'src/node_embedding_api.h',
       'src/node_errors.h',
       'src/node_exit_code.h',
       'src/node_external_reference.h',
@@ -1163,6 +1166,21 @@
             'Ws2_32.lib',
           ],
         }],
+        [ 'node_shared=="true" and node_module_version!="" and OS=="win" and target_arch!="arm64"', {
+          'msvs_settings': {
+            'VCLinkerTool': {
+              'AdditionalOptions': [ '/CETCOMPAT' ],
+            },
+          },
+          'msvs_configuration_attributes': {
+            'SpectreMitigation': 'Spectre',
+          },
+        }],
+        [ 'node_shared=="true" and node_module_version!="" and OS=="win" and target_arch=="arm64"', {
+          'msvs_configuration_attributes': {
+            'SpectreMitigation': 'Spectre',
+          },
+        }],
       ],
     }, # node_lib_target_name
     { # fuzz_env
@@ -1462,6 +1480,15 @@
 
       'sources': [
         'test/embedding/embedtest.cc',
+        'test/embedding/embedtest_c_api.c',
+        'test/embedding/embedtest_c_api_common.c',
+        'test/embedding/embedtest_c_api_common.h',
+        'test/embedding/embedtest_c_api_env.c',
+        'test/embedding/embedtest_c_api_modules.c',
+        'test/embedding/embedtest_c_api_preload.c',
+        'test/embedding/embedtest_c_api_run_main.c',
+        'test/embedding/embedtest_c_api_threading.c',
+        'test/embedding/embedtest_main.cc',
       ],
 
       'conditions': [

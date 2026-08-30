@@ -3,8 +3,8 @@
 #endif
 #include <assert.h>
 #include "cppgc/platform.h"
-#include "executable_wrapper.h"
 #include "node.h"
+#include "uv.h"
 
 #include <algorithm>
 
@@ -28,10 +28,9 @@ static int RunNodeInstance(MultiIsolatePlatform* platform,
                            const std::vector<std::string>& args,
                            const std::vector<std::string>& exec_args);
 
-NODE_MAIN(int argc, node::argv_type raw_argv[]) {
-  char** argv = nullptr;
-  node::FixupMain(argc, raw_argv, &argv);
-
+// Invoked from embedtest_main.cc, either explicitly via the `cpp-api` argument
+// or as the default when no test entry point is named.
+int32_t test_main_cpp_api(int32_t argc, const char* argv[]) {
   std::vector<std::string> args(argv, argv + argc);
   std::shared_ptr<node::InitializationResult> result =
       node::InitializeOncePerProcess(
