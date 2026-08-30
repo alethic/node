@@ -1,3 +1,5 @@
+'use strict';
+
 // Print the globalThis.preloadValue set by the preload script.
 const mainPreloadValue = globalThis.preloadValue;
 
@@ -5,7 +7,7 @@ const mainPreloadValue = globalThis.preloadValue;
 const { Worker } = require('worker_threads');
 const worker = new Worker(
   'require("worker_threads").parentPort.postMessage({value: globalThis.preloadValue})',
-  { eval: true }
+  { eval: true },
 );
 
 const messages = [];
@@ -13,6 +15,6 @@ worker.on('message', (message) => messages.push(message));
 
 process.on('beforeExit', () => {
   console.log(
-    `preloadValue=${mainPreloadValue}; worker preloadValue=${messages[0].value}`
+    `preloadValue=${mainPreloadValue}; worker preloadValue=${messages[0].value}`,
   );
 });

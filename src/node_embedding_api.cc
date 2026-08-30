@@ -232,7 +232,7 @@ class NodeFunctor<TResult (*)(void*, TArgs...)> {
               node_embedding_data_release_callback data_release)
       : callback_(callback), data_(data), data_release_(data_release) {}
 
-  // TODO: add overload for stateless lambdas.
+  // TODO(vmoroz): add overload for stateless lambdas.
   template <typename TFunctor>
   NodeFunctor(TFunctor&& functor)
       : callback_(&NodeFunctorInvoker<TCallback, TFunctor>::Invoke),
@@ -259,7 +259,7 @@ class NodeFunctor<TResult (*)(void*, TArgs...)> {
  private:
   template <typename TFunctor>
   static NodeStatus ReleaseFunctor(void* data) {
-    // TODO: Handle exceptions.
+    // TODO(vmoroz): Handle exceptions.
     delete reinterpret_cast<TFunctor*>(data);
     return NodeStatus::kOk;
   }
@@ -657,7 +657,7 @@ class EmbeddedRuntime {
   };
 
   struct V8ScopeData {
-    V8ScopeData(node::CommonEnvironmentSetup* env_setup)
+    explicit V8ScopeData(node::CommonEnvironmentSetup* env_setup)
         : isolate_(env_setup->isolate()),
           v8_locker_(env_setup->isolate()),
           isolate_scope_(env_setup->isolate()),
@@ -822,13 +822,13 @@ class EmbeddedRuntime {
     case ErrorMessageAction::kSet: {
       auto message_ptr = std::make_unique<std::string>(std::move(message));
       thread_message_ptr = message_ptr->c_str();
-      std::scoped_lock lock(mutex);
+      std::scoped_lock<std::mutex> lock(mutex);
       thread_to_message[std::this_thread::get_id()] = std::move(message_ptr);
       break;
     }
     case ErrorMessageAction::kClear: {
       if (thread_message_ptr != nullptr) {
-        std::scoped_lock lock(mutex);
+        std::scoped_lock<std::mutex> lock(mutex);
         thread_to_message.erase(std::this_thread::get_id());
         thread_message_ptr = nullptr;
       }
@@ -1433,7 +1433,7 @@ void EmbeddedRuntime::RunPollingThread(void* data) {
         nullptr,
         &succeeded);
 
-    // TODO: Handle post_result
+    // TODO(vmoroz): Handle post_result
     (void)post_result;
     if (!succeeded) {
       // The task runner is shutting down.
@@ -1798,7 +1798,10 @@ void EmbeddedRuntime::RegisterModules() {
 
 }  // namespace node::embedding
 
-using namespace node::embedding;
+// The C entry points below are defined at global scope and refer to most of
+// the namespace, so a using-directive is used rather than a long list of
+// using-declarations.
+using namespace node::embedding;  // NOLINT
 
 const char* NAPI_CDECL node_embedding_last_error_message_get() {
   return EmbeddedErrorHandling::GetLastErrorMessage();
@@ -1814,8 +1817,8 @@ void NAPI_CDECL node_embedding_last_error_message_set(const char* message) {
 
 void NAPI_CDECL node_embedding_last_error_message_set_format(const char* format,
                                                              ...) {
-  constexpr size_t buffer_size = 1024;
-  char buffer[buffer_size];
+  constexpr size_t kBufferSize = 1024;
+  char buffer[kBufferSize];
   std::unique_ptr<char[]> dynamic_buffer;
 
   va_list args1;
@@ -1827,7 +1830,7 @@ void NAPI_CDECL node_embedding_last_error_message_set_format(const char* format,
   size_t string_size = std::vsnprintf(nullptr, 0, format, args1);
   va_end(args1);
   char* message = buffer;
-  if (string_size >= buffer_size) {
+  if (string_size >= kBufferSize) {
     dynamic_buffer = std::make_unique<char[]>(string_size + 1);
     message = dynamic_buffer.get();
   }

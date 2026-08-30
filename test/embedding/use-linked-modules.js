@@ -1,3 +1,5 @@
+'use strict';
+
 // Check that the linked modules defined in the executable can be used in
 // the main thread and worker thread.
 
@@ -16,7 +18,7 @@ const worker = new Worker(
     'const names = replicatorModule.replicate("Node");\n' +
     'const greeting = greeterModule.greet(names);\n' +
     'require("worker_threads").parentPort.postMessage({greeting});',
-  { eval: true }
+  { eval: true },
 );
 
 const messages = [];
